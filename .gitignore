@@ -1,20 +1,29 @@
-### IntelliJ IDEA ###
+### Java compiled files ###
+*.class
 out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-.kotlin
+bin/
+
+### Local SQLite database files ###
+# Do not push your personal database data.
+students.db
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+### VS Code ###
+.vscode/
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
 
 ### Eclipse ###
-.apt_generated
 .classpath
-.factorypath
 .project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+.settings/
+.apt_generated/
+.factorypath
 
 ### NetBeans ###
 /nbproject/private/
@@ -23,23 +32,9 @@ bin/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
-.vscode/
-
-### Mac OS ###
+### System files ###
 .DS_Store
-# Java compiled files
-*.class
-out/
+Thumbs.db
 
-# SQLite database file
-students.db
-*.db
-
-# VS Code / IntelliJ files
-.vscode/
-.idea/
-*.iml
-
-# Logs
+### Logs ###
 *.log
