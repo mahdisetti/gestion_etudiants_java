@@ -68,7 +68,6 @@ public class MainSwing {
         };
 
         btnLogin.addActionListener(e -> login.run());
-
         mdpField.addActionListener(e -> login.run());
 
         btnSignup.addActionListener(e -> {
@@ -125,6 +124,7 @@ public class MainSwing {
         });
 
         JPanel top = new JPanel(new BorderLayout());
+
         JLabel userLabel = new JLabel("Utilisateur connecté : " + Session.getCurrentUsername());
         userLabel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
@@ -310,7 +310,10 @@ public class MainSwing {
         JLabel msg = new JLabel(" ");
 
         JButton btnView = new JButton("Voir");
-        JButton btnExport = new JButton("Exporter (.txt)");
+        JButton btnExport = new JButton("Exporter");
+
+        String[] formats = {"TXT", "Console"};
+        JComboBox<String> formatBox = new JComboBox<>(formats);
 
         btnView.addActionListener(e -> {
             Optional<Etudiant> opt = GestionEtudiants.findByCin(cin.getText().trim());
@@ -333,7 +336,18 @@ public class MainSwing {
             }
 
             try {
-                ok(msg, "Exporté : " + Bulletin.exporter(opt.get()));
+                BulletinExporter exporter;
+
+                if ("TXT".equals(formatBox.getSelectedItem())) {
+                    exporter = new TxtBulletinExporter();
+                } else {
+                    exporter = new ConsoleBulletinExporter();
+                }
+
+                exporter.exporter(opt.get());
+
+                ok(msg, "Bulletin exporté avec le format : " + exporter.getNomFormat());
+
             } catch (IOException ex) {
                 err(msg, "Erreur : " + ex.getMessage());
             }
@@ -343,6 +357,10 @@ public class MainSwing {
         top.add(new JLabel("CIN :"));
         top.add(cin);
         top.add(btnView);
+
+        top.add(new JLabel("Format :"));
+        top.add(formatBox);
+
         top.add(btnExport);
 
         JPanel panel = new JPanel(new BorderLayout(6, 6));
