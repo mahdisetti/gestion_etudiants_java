@@ -16,19 +16,24 @@ public class GestionEtudiants {
     public static void chargerDepuisDatabase() {
         etudiants.clear();
 
-        String sqlEtudiants = "SELECT cin, nom FROM etudiants";
-        String sqlNotes = "SELECT cin, matiere, note1, note2 FROM notes";
+        int userId = Session.getCurrentUserId();
+
+        String sqlEtudiants = "SELECT cin, nom FROM etudiants WHERE user_id = ?";
+        String sqlNotes = "SELECT cin, matiere, note1, note2 FROM notes WHERE user_id = ?";
 
         try (Connection conn = Database.connect();
-             PreparedStatement ps = conn.prepareStatement(sqlEtudiants);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = conn.prepareStatement(sqlEtudiants)) {
 
-            while (rs.next()) {
-                String cin = rs.getString("cin");
-                String nom = rs.getString("nom");
+            ps.setInt(1, userId);
 
-                Etudiant e = new Etudiant(cin, nom);
-                etudiants.put(cin, e);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String cin = rs.getString("cin");
+                    String nom = rs.getString("nom");
+
+                    Etudiant e = new Etudiant(cin, nom);
+                    etudiants.put(cin, e);
+                }
             }
 
         } catch (SQLException e) {
@@ -36,18 +41,21 @@ public class GestionEtudiants {
         }
 
         try (Connection conn = Database.connect();
-             PreparedStatement ps = conn.prepareStatement(sqlNotes);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = conn.prepareStatement(sqlNotes)) {
 
-            while (rs.next()) {
-                String cin = rs.getString("cin");
-                String matiere = rs.getString("matiere");
-                float note1 = rs.getFloat("note1");
-                float note2 = rs.getFloat("note2");
+            ps.setInt(1, userId);
 
-                Etudiant e = etudiants.get(cin);
-                if (e != null) {
-                    e.ajouterNotes(matiere, note1, note2);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String cin = rs.getString("cin");
+                    String matiere = rs.getString("matiere");
+                    float note1 = rs.getFloat("note1");
+                    float note2 = rs.getFloat("note2");
+
+                    Etudiant e = etudiants.get(cin);
+                    if (e != null) {
+                        e.ajouterNotes(matiere, note1, note2);
+                    }
                 }
             }
 
@@ -57,13 +65,16 @@ public class GestionEtudiants {
     }
 
     public static void ajouterEtudiant(Etudiant e) {
-        String sql = "INSERT INTO etudiants(cin, nom) VALUES(?, ?)";
+        int userId = Session.getCurrentUserId();
+
+        String sql = "INSERT INTO etudiants(cin, nom, user_id) VALUES(?, ?, ?)";
 
         try (Connection conn = Database.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, e.getCin());
             ps.setString(2, e.getNom());
+            ps.setInt(3, userId);
             ps.executeUpdate();
 
             etudiants.put(e.getCin(), e);
@@ -74,7 +85,9 @@ public class GestionEtudiants {
     }
 
     public static void ajouterNotes(String cin, String matiere, float note1, float note2) {
-        String sql = "INSERT INTO notes(cin, matiere, note1, note2) VALUES(?, ?, ?, ?)";
+        int userId = Session.getCurrentUserId();
+
+        String sql = "INSERT INTO notes(cin, matiere, note1, note2, user_id) VALUES(?, ?, ?, ?, ?)";
 
         try (Connection conn = Database.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -83,6 +96,7 @@ public class GestionEtudiants {
             ps.setString(2, matiere);
             ps.setFloat(3, note1);
             ps.setFloat(4, note2);
+            ps.setInt(5, userId);
             ps.executeUpdate();
 
             Etudiant e = etudiants.get(cin);
@@ -104,12 +118,16 @@ public class GestionEtudiants {
     }
 
     public static boolean supprimer(String cin) {
-        String sql = "DELETE FROM etudiants WHERE cin = ?";
+        int userId = Session.getCurrentUserId();
+
+        String sql = "DELETE FROM etudiants WHERE cin = ? AND user_id = ?";
 
         try (Connection conn = Database.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cin);
+            ps.setInt(2, userId);
+
             int rows = ps.executeUpdate();
 
             if (rows > 0) {
