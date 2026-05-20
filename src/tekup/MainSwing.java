@@ -8,9 +8,12 @@ import java.util.Optional;
 
 public class MainSwing {
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(MainSwing::showLogin);
-    }
+   public static void main(String[] args) {
+    Database.initDatabase();
+    GestionEtudiants.chargerDepuisDatabase();
+
+    SwingUtilities.invokeLater(MainSwing::showLogin);
+}
 
     // LOGIN SCREEN
     static void showLogin() {
@@ -139,7 +142,7 @@ public class MainSwing {
                 float v1 = Float.parseFloat(n1.getText().trim());
                 float v2 = n2.getText().trim().isEmpty() ? v1 : Float.parseFloat(n2.getText().trim());
                 if (v1 < 0 || v1 > 20 || v2 < 0 || v2 > 20) throw new NumberFormatException();
-                opt.get().ajouterNotes(mat.getText().trim(), v1, v2);
+                GestionEtudiants.ajouterNotes(cin.getText().trim(), mat.getText().trim(), v1, v2);
                 ok(msg, "Notes enregistrées !");
                 mat.setText(""); n1.setText(""); n2.setText("");
             } catch (NumberFormatException ex) { err(msg, "Notes invalides (0–20)."); }
