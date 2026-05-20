@@ -28,3 +28,18 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+# Java compiled files
+*.class
+out/
+
+# SQLite database file
+students.db
+*.db
+
+# VS Code / IntelliJ files
+.vscode/
+.idea/
+*.iml
+
+# Logs
+*.log
